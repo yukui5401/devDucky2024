@@ -1,7 +1,12 @@
 import React from "react";
+import CardGrid from "../components/CardGrid";
 
 const Dashboard = () => {
-  return <div>Dashboard</div>;
+  return (
+    <>
+      <CardGrid />
+    </>
+  );
 };
 
 export default Dashboard;

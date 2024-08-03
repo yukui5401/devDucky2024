@@ -13,7 +13,7 @@ const Homepage = () => {
         IDE is connected to a rubber ducky that can talk you through your
         problems.
       </CenteredParagraph>
-      <Button>Try it out now!</Button>
+      <Button link={`/dashboard`}>Try it out now!</Button>
     </>
   );
 };
