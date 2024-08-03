@@ -6,6 +6,9 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const axios = require('axios');
+const multer = require("multer");
+const { createClient } = require("@deepgram/sdk");
+const fs = require("fs");
 
 connectDB();
 
@@ -18,6 +21,40 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser())
+
+const deepgram = createClient(process.env.DEEPGRAM_API);
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./"); // reserved directory on OS
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+const transcribeFile = async (path) => {
+  try {
+    const result = await deepgram.listen.prerecorded.transcribeFile(
+      fs.readFileSync(path),
+      {
+        model: "nova-2",
+        smart_format: true,
+      }
+    );
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+app.post("/", upload.single("audio"), async (req, res) => {
+  const file = req.file;
+  const response = await transcribeFile(file.path);
+  res.send(response);
+});
 
 app.get('/call-flask', async (req, res) => {
     try {
