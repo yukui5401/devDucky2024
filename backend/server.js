@@ -8,8 +8,9 @@ const connectDB = require("./config/db");
 const axios = require("axios");
 const multer = require("multer");
 const { createClient } = require("@deepgram/sdk");
+const { runPylint } = require('./services/LintServices/Python/run-py-lint');
 const fs = require("fs");
-const AIPredictionsRoute = require("./routes/AIPredictionsRoute");
+
 
 connectDB();
 
@@ -23,6 +24,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/", require("./routes/AIPredictionsRoute"));
+app.use("/", require("./routes/LinterRoutes"));
+
 const deepgram = createClient(process.env.DEEPGRAM_API);
 
 const storage = multer.diskStorage({

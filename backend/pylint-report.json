@@ -1,28 +1,67 @@
 [
     {
         "type": "convention",
-        "module": "test",
+        "module": "tempPyCode",
         "obj": "",
         "line": 1,
         "column": 0,
         "endLine": null,
         "endColumn": null,
-        "path": "test.txt",
+        "path": "tempPyCode.txt",
         "symbol": "missing-final-newline",
         "message": "Final newline missing",
         "message-id": "C0304"
     },
     {
         "type": "convention",
-        "module": "test",
+        "module": "tempPyCode",
         "obj": "",
         "line": 1,
         "column": 0,
         "endLine": null,
         "endColumn": null,
-        "path": "test.txt",
+        "path": "tempPyCode.txt",
         "symbol": "missing-module-docstring",
         "message": "Missing module docstring",
         "message-id": "C0114"
+    },
+    {
+        "type": "convention",
+        "module": "tempPyCode",
+        "obj": "",
+        "line": 1,
+        "column": 0,
+        "endLine": null,
+        "endColumn": null,
+        "path": "tempPyCode.txt",
+        "symbol": "invalid-name",
+        "message": "Module name \"tempPyCode\" doesn't conform to snake_case naming style",
+        "message-id": "C0103"
+    },
+    {
+        "type": "warning",
+        "module": "tempPyCode",
+        "obj": "",
+        "line": 1,
+        "column": 0,
+        "endLine": 1,
+        "endColumn": 18,
+        "path": "tempPyCode.txt",
+        "symbol": "pointless-statement",
+        "message": "Statement seems to have no effect",
+        "message-id": "W0104"
+    },
+    {
+        "type": "error",
+        "module": "tempPyCode",
+        "obj": "",
+        "line": 1,
+        "column": 0,
+        "endLine": 1,
+        "endColumn": 18,
+        "path": "tempPyCode.txt",
+        "symbol": "undefined-variable",
+        "message": "Undefined variable 'aisdnfiasdnfsadinf'",
+        "message-id": "E0602"
     }
 ]
