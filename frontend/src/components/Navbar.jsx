@@ -15,13 +15,17 @@ const Navbar = () => {
         <div className="flex h-20 items-center justify-between">
           <div className="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
             <NavLink className="flex flex-shrink-0 items-center mr-4" to="/">
-              <img className="h-10 w-auto" src={logo} alt="devDucky" />
+              <img
+                className="h-10 w-10 rounded-full object-cover"
+                src={logo}
+                alt="devDucky"
+              />
               <span className="hidden md:block text-white text-2xl font-bold ml-2">
                 devDucky
               </span>
             </NavLink>
             <div className="md:ml-auto">
-              <div className="flex space-x-2">
+              <div className="flex space-x-4">
                 <NavLink to="/" className={linkClass}>
                   Home
                 </NavLink>
