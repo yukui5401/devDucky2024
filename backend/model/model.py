@@ -25,8 +25,7 @@ def ollama_func(model, prompt):
     )['message']['content']
 
 if __name__ == '__main__':
-    #app.run(port=5000)
-    query = 'Pritn("Hello, world");'
+    app.run(port=5000)
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=query) # query is what you feed into the model
     print(ollama_func(model, prompt))
