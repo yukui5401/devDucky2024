@@ -15,11 +15,22 @@ You have been given some code, please review it and discuss any potential issues
 Example (do not copy the contents directly, use it as a template and use your own logic given Context): {{"topic": "There are issues with the syntax", "advice": ["You should use a semicolon at the end of the line", "You should use a colon after the if statement", "You should use a colon after the else statement"], "confidence": [0.99, 0.98, 0.97], "code": "if (x == 1) {{ print('Hello, World!') }} else {{ print('Goodbye, World!') }}"}}
 """
 
-@app.route('/flask-route', methods=['POST'])
-def flask_route():
+@app.route('/code-input', methods=['POST'])
+def c_route():
     query = request.json["query"]
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=query) # query is what you feed into the model
+    return prompt
+
+@app.route('/generate-suggestions', methods=['POST'])
+def g_route(transcribed = ""):
+    query = request.json["query"]
+    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    if len(transcribed) > 0:
+        query += "Alongside, here is my transcribed text: " + transcribed
+        prompt = prompt_template.format(context=query)
+    else:
+        prompt = prompt_template.format(context=query) # query is what you feed into the model
     return prompt
 
 def ollama_func(model, prompt):

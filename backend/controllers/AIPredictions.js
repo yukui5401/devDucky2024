@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
-const AIPRedictServices = require('../services/AIPredictServices');
 const UserMLResponseSchema = require('../model/AIPredictModel');
+const axios = require('axios');
+const fs = require('fs');
+const FormData = require('form-data');
 
 const Create = async (req, res, next) => {
     try {
@@ -23,28 +25,28 @@ const Read = async (req, res, next) => {
     }
 }
 
-// GET METHOD BY BEST PROBABILITY
+const GetCodeInputSuggestion = async (req, res, next) => {
+    const form = new FormData();
 
-const GetBestProbability = async (req, res, next) => {
-    try {
-        let arr = [];
-        for (let i = 0; i < 4; i++) {
-            const bestProbability = await AIPRedictServices.GetBestProbability();
-            arr.push(bestProbability);
-        }
-        res.status(200).json();
+    const filePath = "/tmp/devducky.mp3";
 
-    } catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+    form.append('audio', fs.createReadStream(filePath));
+
+    const response = await axios.post('http://localhost:4000/', form, {
+        headers: form.getHeaders(),
+    });
+
+    res.status(200).json(response.data);
+
+    // Read a file from the local file system and append it to the form
+
 }
-
-
 
 
 
 module.exports = {
     Create,
-    Read
+    Read,
+    GetCodeInputSuggestion
 }
-//
+//UserMLResponseSchema.

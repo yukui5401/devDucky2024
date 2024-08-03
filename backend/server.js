@@ -9,6 +9,7 @@ const axios = require("axios");
 const multer = require("multer");
 const { createClient } = require("@deepgram/sdk");
 const fs = require("fs");
+const AIPredictionsRoute = require("./routes/AIPredictionsRoute");
 
 connectDB();
 
@@ -21,57 +22,57 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-
+app.use("/", require("./routes/AIPredictionsRoute"));
 const deepgram = createClient(process.env.DEEPGRAM_API);
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./"); // reserved directory on OS
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
+    destination: (req, file, cb) => {
+        cb(null, "/tmp"); // reserved directory on OS
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    },
 });
 
 const upload = multer({ storage: storage });
 
 const transcribeFile = async (path) => {
-  try {
-    const result = await deepgram.listen.prerecorded.transcribeFile(
-      fs.readFileSync(path),
-      {
-        model: "nova-2",
-        smart_format: true,
-      }
-    );
-    return result.result?.results.channels[0].alternatives[0].transcript;
-  } catch (err) {
-    console.log(err);
-  }
+    try {
+        const result = await deepgram.listen.prerecorded.transcribeFile(
+            fs.readFileSync(path),
+            {
+                model: "nova-2",
+                smart_format: true,
+            }
+        );
+        return result.result?.results.channels[0].alternatives[0].transcript;
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 app.post("/", upload.single("audio"), async (req, res) => {
-  const file = req.file;
-  const response = await transcribeFile(file.path);
-  res.send(response);
+    const file = req.file;
+    const response = await transcribeFile(file.path);
+    res.send(response);
 });
 
 app.get("/call-flask", async (req, res) => {
-  try {
-    const flaskResponse = await axios.get(`${FLASK_URL}/flask-route`);
-    res.json(flaskResponse.data);
-  } catch (error) {
-    console.error("Error calling Flask:", error.message);
-    res.status(500).json({ error: "Error calling Flask API" });
-  }
+    try {
+        const flaskResponse = await axios.get(`${FLASK_URL}/flask-route`);
+        res.json(flaskResponse.data);
+    } catch (error) {
+        console.error("Error calling Flask:", error.message);
+        res.status(500).json({ error: "Error calling Flask API" });
+    }
 });
 
 let server;
 app.listen(PORT, () => {
-  console.log("Server is running on Port:", PORT);
+    console.log("Server is running on Port:", PORT);
 });
 
 process.on("unhandledRejection", (err, promise) => {
-  console.log(`Logged Error: ${err}`);
-  server.close(() => process.exit(1));
+    console.log(`Logged Error: ${err}`);
+    server.close(() => process.exit(1));
 });
