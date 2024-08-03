@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import ollama
 from langchain.prompts import ChatPromptTemplate
@@ -13,9 +13,12 @@ You have been given some code, please review it and discuss any potential issues
 Example (do not copy the contents directly, use it as a template and use your own logic given Context): {{"topic": "There are issues with the syntax", "advice": ["You should use a semicolon at the end of the line", "You should use a colon after the if statement", "You should use a colon after the else statement"], "confidence": [0.99, 0.98, 0.97], "code": "if (x == 1) {{ print('Hello, World!') }} else {{ print('Goodbye, World!') }}"}}
 """
 
-@app.route('/flask-route')
+@app.route('/flask-route', methods=['POST'])
 def flask_route():
-    return jsonify({"message": "Flask route test"})
+    query = request.json["query"]
+    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    prompt = prompt_template.format(context=query) # query is what you feed into the model
+    return prompt
 
 def ollama_func(model, prompt):
     return ollama.chat(
@@ -26,6 +29,3 @@ def ollama_func(model, prompt):
 
 if __name__ == '__main__':
     app.run(port=5000)
-    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
-    prompt = prompt_template.format(context=query) # query is what you feed into the model
-    print(ollama_func(model, prompt))
