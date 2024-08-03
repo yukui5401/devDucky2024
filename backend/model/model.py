@@ -5,9 +5,9 @@ import ollama
 app = Flask(__name__)
 CORS(app)
 
-model = 'codegeex4'
+model = 'test1234'
 prompt = """
-Hello
+Hello! Name first 20 digits of Pi, then tell me how to make a chess engine in Python.
 """
 
 @app.route('/flask-route')
@@ -23,4 +23,4 @@ def ollama_func(model, prompt):
 
 if __name__ == '__main__':
     print(ollama_func(model, prompt))
-    app.run(port=5000)
+    #app.run(port=5000)
