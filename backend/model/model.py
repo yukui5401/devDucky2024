@@ -1,13 +1,16 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import ollama
+from langchain.prompts import ChatPromptTemplate
 
 app = Flask(__name__)
 CORS(app)
 
 model = 'test1234'
-prompt = """
-Hello! Name first 20 digits of Pi, then tell me how to make a chess engine in Python.
+PROMPT_TEMPLATE = """
+Context: {context}
+You have been given some code, please review it and discuss any potential issues in "topic", an array of 2-3 potential recommendations in "recommendations", the corresponding confidence from 0-1 on each recommendation as an array corresponding to the index of the recommendations array in "percentages" and any example code in "code". Format your response in this format: {"topic": "Potential issues", "advice": ["Potential advice 1", "Potential advice 2", Potential advice 3"], "confidence": [1.00, 0.99, 0.81], code": "Example code"}
+Example: {"topic": "There are issues with the syntax", "advice": ["You should use a semicolon at the end of the line", "You should use a colon after the if statement", "You should use a colon after the else statement"], "confidence": [0.99, 0.98, 0.97], "code": "if (x == 1) { print('Hello, World!') } else { print('Goodbye, World!') }"}
 """
 
 @app.route('/flask-route')
@@ -22,5 +25,7 @@ def ollama_func(model, prompt):
     )['message']['content']
 
 if __name__ == '__main__':
+    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    prompt = prompt_template.format(context=query) # query is what you feed into the model
     print(ollama_func(model, prompt))
     #app.run(port=5000)
