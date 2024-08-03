@@ -1,4 +1,4 @@
-// grid of cards
+// grid of statcards
 import React from "react";
 
 const CardGrid = () => {
