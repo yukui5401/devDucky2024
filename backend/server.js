@@ -27,7 +27,7 @@ const deepgram = createClient(process.env.DEEPGRAM_API);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "./"); // reserved directory on OS
+        cb(null, "/tmp"); // reserved directory on OS
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname);
