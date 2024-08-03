@@ -9,8 +9,8 @@ export default {
       gridTemplateColumns: {
         "70/30": "70% 28%",
       },
-      color: {
-        "custom-green": "#DEFFCD",
+      colors: {
+        "custom-green": "#D0EFB1",
       },
     },
   },
