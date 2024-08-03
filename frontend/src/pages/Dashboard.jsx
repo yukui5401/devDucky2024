@@ -1,10 +1,10 @@
 import React from "react";
-import CardGrid from "../components/CardGrid";
+import TrackingStatsToggle from "../components/TrackingStatsToggle";
 
 const Dashboard = () => {
   return (
     <>
-      <CardGrid />
+      <TrackingStatsToggle />
     </>
   );
 };
