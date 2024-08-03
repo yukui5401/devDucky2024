@@ -30,7 +30,7 @@ const CodeEditor = () => {
     };
   }, []);
 
-  return <div ref={editorRef} style={{ height: "100vh", width: "100%" }} />;
+  return <div ref={editorRef} style={{ height: "60vh", width: "100%" }} />;
 };
 
 export default CodeEditor;
