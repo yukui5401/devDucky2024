@@ -26,3 +26,6 @@ dist-ssr
 .env
 .venv
 __pycache__
+
+# Model (over 5 gb, can just download from HF)
+model.gguf
