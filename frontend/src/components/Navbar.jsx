@@ -1,9 +1,8 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import logo from "../assets/images/logo.png";
+import logo from "../assets/logo.png";
 
-// need to add hamburger I guess
-// and change colours probably
+// change colours probably
 
 const Navbar = () => {
   const linkClass = ({ isActive }) =>
