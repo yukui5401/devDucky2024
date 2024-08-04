@@ -1,75 +1,104 @@
-import React, { useState, useRef } from "react";
-import { Button } from "antd";
-import { saveAs } from "file-saver";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-const Mic = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioURL, setAudioURL] = useState("");
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const [isTracking, setIsTracking] = useState(false);
+export const domain = import.meta.env.PROD
+  ? import.meta.env.VITE_PRODUCTION_URL
+  : import.meta.env.VITE_LOCAL_URL;
 
-  const handleToggleTracking = () => {
-    setIsTracking(!isTracking);
-    // Add any additional logic needed to start or stop tracking
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      mediaRecorderRef.current.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/wav",
-        });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        setAudioURL(audioUrl);
-        saveAudioLocally(audioBlob);
-        audioChunksRef.current = [];
-      };
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error("Error accessing microphone:", error);
+const finalAnswer = async () => {
+  const answer = await axios.post(
+    // get code response (in JSON) from model
+    "http://localhost:5005/generate-suggestions",
+    {
+      query: "if (file) { return 'not found' } else { return 'not found' }",
+      transcribed: "What is wrong with my code!",
     }
-  };
-  const saveAudioLocally = (audioBlob) => {
-    const fileName = `recording_${new Date().toISOString()}.wav`;
-    saveAs(audioBlob, fileName);
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
-  return (
-    <div>
-      <Button
-        className={`text-white px-4 py-2 rounded-lg ml-auto mr-6 bg-orange-600 hover:bg-green-700${
-          isTracking
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-green-600 hover:bg-green-700"
-        }`}
-        onClick={handleToggleTracking}
-      >
-        {isTracking ? "Stop Tracking" : "Start Tracking"}
-      </Button>
-      <Button onClick={isRecording ? stopRecording : startRecording}>
-        {isRecording ? "Stop Recording" : "Start Recording"}
-      </Button>
-      {audioURL && (
-        <audio src={audioURL} controls style={{ display: "none" }} />
-      )}
-    </div>
   );
+  let formattedAnswer = answer.data;
+  console.log(formattedAnswer);
 };
 
-export default Mic;
+export default function MicTest() {
+  const [fullTranscript, setFullTranscript] = useState("");
+  const [paused, setPaused] = useState(false);
+  const [tempTranscript, setTempTranscript] = useState("");
+  const [recognition, setRecognition] = useState(null);
+  const [recognitionActive, setRecognitionActive] = useState(false);
+
+  const startRecognition = () => {
+    if (recognition && !recognitionActive) {
+      recognition.start();
+      setRecognitionActive(true);
+    }
+  };
+
+  const stopRecognition = () => {
+    if (recognition && recognitionActive) {
+      recognition.stop();
+      setRecognitionActive(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Your browser does not support the Web Speech API.");
+      return;
+    }
+
+    const SpeechRecognition = window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+
+    recognition.onresult = (event) => {
+      let interimTranscript = "";
+      let finalTranscript = "";
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + " ";
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        setTempTranscript(finalTranscript);
+        setFullTranscript((prevTranscript) => prevTranscript + finalTranscript);
+      }
+
+      document.getElementById("interim").innerHTML = interimTranscript;
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error detected: " + event.error);
+    };
+
+    setRecognition(recognition);
+  }, []);
+  return (
+    <div>
+      <button
+        style={{
+          width: "100px",
+          height: "100px",
+          display: "block",
+          margin: "0 auto",
+          background: paused ? "red" : "green",
+        }}
+        onClick={async () => {
+          setPaused(!paused);
+          if (!paused) {
+            startRecognition();
+          } else {
+            stopRecognition();
+            await finalAnswer();
+          }
+        }}
+      ></button>
+      <div id="interim"></div>
+      <div>{fullTranscript}</div>
+    </div>
+  );
+}
