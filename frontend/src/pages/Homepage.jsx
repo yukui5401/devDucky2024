@@ -24,7 +24,7 @@ const Homepage = () => {
           connected to a rubber ducky that can talk you through your problems.
         </p>
       </div>
-      <div className="bg-custom-green grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6 p-4">
+      <div className="bg-custom-green grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6 p-4 pb-6">
         <div className="flex flex-col items-center">
           <img
             src={duckBehind}
