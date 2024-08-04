@@ -1,5 +1,16 @@
 # devDucky @ HT6 2024
-Developer tool.
+
+## About
+An integrated IDE that does more than hold your code.
+
+### Stack
+- Unsloth: We used Unsloth to fine-tune and quantize our model. We fine-tuned three different models (llama3.1 @ 375 steps, tinyllama @ 1 epoch, phi3 @ 375 steps) before settling on phi3 due to hardware constraints. We quantized all of our models to Q4_K_M.
+- Ollama: We used the Ollama python library along with the Ollama cli and desktop instance to run inference on our model.
+- Express: 
+- Node: 
+- Vite: 
+- Flask: 
+- Mongoose: 
 
 ## Ollama Setup
 **Make sure you have downloaded, installed, and are running the Ollama desktop app from (https://ollama.com/download) (make sure to install the cli)**
