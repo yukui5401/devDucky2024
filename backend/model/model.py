@@ -5,9 +5,15 @@ from langchain.prompts import ChatPromptTemplate
 
 app = Flask(__name__)
 CORS(app)
-
 model = 'duckyModel'
-PROMPT_TEMPLATE = """
+
+PROMPT_TEMPLATE_V1 = """
+Context: {context}
+Fix the code above for syntax and logical errors. Return your response with 2 keys: advice and improved_code.
+"""
+
+
+PROMPT_TEMPLATE_V2 = """
 Transcript: {transcript}
 Context: {context}
 Fix the code above for syntax and logical errors. Return your response with 2 keys: topic (choose from syntax/logic error or optimization), advice, advice_confidence (from 0 to 1) and improved_code.
@@ -16,15 +22,15 @@ Fix the code above for syntax and logical errors. Return your response with 2 ke
 @app.route('/code-input', methods=['POST'])
 def c_route():
     query = request.json["query"]
-    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE_V1)
     prompt = prompt_template.format(context=query) # query is what you feed into the model
-    return prompt
+    return ollama_func(model, prompt)
 
 @app.route('/generate-suggestions', methods=['POST'])
 def g_route():
     query = request.json["query"]
     transcribed = request.json["transcribed"]
-    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE_V2)
     prompt = prompt_template.format(context=query, transcript=transcribed)
     return ollama_func(model, prompt)
 
@@ -37,4 +43,4 @@ def ollama_func(model, prompt):
     )['message']['content']
 
 if __name__ == '__main__':
-    app.run(port=5001)
+    app.run(port=5005)
