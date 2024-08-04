@@ -23,7 +23,8 @@ const Read = async (req, res, next) => {
   }
 };
 
-const GetCodeInputSuggestion = async (req, res, next) => { // endpoint: 4000/llm/generate_cs
+const GetCodeInputSuggestion = async (req, res, next) => {
+  // endpoint: 4000/llm/generate_cs
   const form = new FormData();
 
   const filePath = "/tmp/devducky.mp3";
@@ -34,15 +35,16 @@ const GetCodeInputSuggestion = async (req, res, next) => { // endpoint: 4000/llm
     headers: form.getHeaders(),
   });
 
-  const answer = await axios.post( // get code response (in JSON) from model
+  const answer = await axios.post(
+    // get code response (in JSON) from model
     "http://localhost:5001/generate-suggestions",
     {
       query: "how are you doing",
       transcribed: "good, how are you",
     }
   );
-  const formattedAnswer = answer.data;
-  console.log(typeof(formattedAnswer));
+  let formattedAnswer = answer.data;
+  console.log(typeof formattedAnswer);
   res.send(formattedAnswer);
 
   // Read a file from the local file system and append it to the form
