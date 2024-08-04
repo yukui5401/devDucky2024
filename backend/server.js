@@ -8,8 +8,8 @@ const connectDB = require("./config/db");
 const axios = require("axios");
 const multer = require("multer");
 const { createClient } = require("@deepgram/sdk");
-const { runPylint } = require('./services/LintServices/Python/run-py-lint');
 const fs = require("fs");
+const path = require("path");
 
 
 connectDB();
@@ -69,6 +69,7 @@ app.get("/call-flask", async (req, res) => {
         res.status(500).json({ error: "Error calling Flask API" });
     }
 });
+
 
 let server;
 app.listen(PORT, () => {

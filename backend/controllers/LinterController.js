@@ -5,6 +5,7 @@ const { lintTypeScript } = require('../services/LintServices/Typescript/run-ts-l
 const { LintingSchema } = require('../model/LintingModel');
 const LintingModel = mongoose.model("LintingModel", LintingSchema); // Corrected line
 const fs = require('fs').promises;
+exports.fs = fs;
 const path = require('path');
 
 const PostPyLint = async (req, res, next) => {
