@@ -1,22 +1,27 @@
 import React from "react";
+import { motion } from "framer-motion";
+import { HeroHighlight, Highlight } from "./hero-highlight";
 
-// do we want like a background image? can use Adobe stock or something maybe
-// title and subtitle are a work in progress
-const Hero = ({
-  title = "Say goodbye to hours of headbanging.",
-  subtitle = "Introducing... devDucky! An integrated IDE that does more than hold your code",
-}) => {
+const Hero = () => {
   return (
-    <section className="bg-custom-green py-20 mb-4">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-black sm:text-5xl md:text-6xl">
-            {title}
-          </h1>
-          <p className="my-4 text-xl text-black">{subtitle}</p>
-        </div>
-      </div>
-    </section>
+    <div className="max-w-8xl mx-auto px-4 bg-custom-green">
+      <HeroHighlight>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: [20, -5, 0] }}
+          transition={{ duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }}
+          className="text-2xl px-4 md:text-4xl lg:text-5xl font-bold text-neutral-700 dark:text-white max-w-5xl leading-relaxed lg:leading-snug text-center mx-auto"
+        >
+          Say goodbye to hours of headbanging, and hello to devDucky! <br />
+          <span className="text-4xl">
+            An integrated IDE that{" "}
+            <Highlight className="text-black dark:text-white">
+              does more than hold your code.
+            </Highlight>
+          </span>
+        </motion.h1>
+      </HeroHighlight>
+    </div>
   );
 };
 
