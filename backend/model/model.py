@@ -9,13 +9,13 @@ model = 'duckyModel'
 
 PROMPT_TEMPLATE_V1 = """
 Context: {context}
-Fix the code above for syntax and logical errors in JavaScript. Return your response with 2 keys: advice and code.
+Provide programming advice for how to proceed with the issues present in the example above.
 """
 
 PROMPT_TEMPLATE_V2 = """
 Transcript: {transcript}
 Context: {context}
-Fix the code above for syntax and logical errors in JavaScript. Return your response with 2 keys: advice and code.
+Provide programming advice for how to proceed with the issues present in the example above.
 """
 
 @app.route('/code-input', methods=['POST'])
@@ -38,7 +38,7 @@ def ollama_func(model, prompt):
         model=model,
         messages=[{'role': 'user', 'content': prompt}],
         stream=False,
-        format="json",
+        # format="json"
     )['message']['content']
 
 if __name__ == '__main__':

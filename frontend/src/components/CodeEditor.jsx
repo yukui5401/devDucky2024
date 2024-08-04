@@ -4,6 +4,8 @@ import { CaretRightOutlined } from "@ant-design/icons";
 import { Collapse, message, theme } from "antd";
 import { Button } from "antd";
 import axios from "axios";
+import { marked } from "marked";
+
 
 const CodeEditor = () => {
   const editorRef = useRef(null);
@@ -13,16 +15,20 @@ const CodeEditor = () => {
   const [codeInput, setCodeInput] = useState("");
   const [_loading, setLoading] = useState(false);
 
+  const [micResponse, setMicResponse] = useState(null);
+
+  const [micResponseStr, setMicResponseStr] = useState(
+    "Waiting on response..."
+  );
+
+  // const [advice, setAdvice] = useState(null);
+  // const [code, setCode] = useState("");
+
   const [line = 0, setLine] = useState(0);
   const [messages = [], setMessages] = useState([]);
   const [errorCount = 0, setErrorCount] = useState(0);
   const [fixableErrorCount = 0, setFixableErrorCount] = useState(0);
   const [warnings, setWarnings] = useState(0);
-
-  const [duckyTopic, setDuckyTopic] = useState("");
-  const [duckyAdvices, setDuckyAdvices] = useState("");
-  const [duckyAdvicesConfidence, setDuckyAdvicesConfidence] = useState("");
-  const [duckyCode, setDuckyCode] = useState("");
 
   const getItems = (panelStyle) => [
     {
@@ -41,16 +47,8 @@ const CodeEditor = () => {
     },
     {
       key: "2",
-      label: "Ducky Advices",
-      children: (
-        <p>
-          Ducky says: <br />
-          Topic: {duckyTopic} <br />
-          Advices: {duckyAdvices} <br />
-          Confidence: {duckyAdvicesConfidence} <br />
-          Code: {duckyCode}
-        </p>
-      ),
+      label: "Ducky Advice",
+      children: <p>{micResponseStr}</p>,
       style: { panelStyle },
     },
   ];
@@ -229,13 +227,35 @@ const CodeEditor = () => {
       const response = await axios.post("http://localhost:5005/code-input", {
         query: editor.getSession().getValue(),
       });
-      console.log(response.data);
     } catch (error) {
       console.error("Error making request:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Function to update codeInput state
+  const handleEditorChange = () => {
+    const newCode = editor.getSession().getValue();
+    setCodeInput(newCode);
+  };
+
+  const handleMicResponse = (data) => {
+    setMicResponse(data);
+    // setMicResponseStr(marked.parse(JSON.stringify(data, null, 2)));
+    setMicResponseStr(JSON.stringify(data,null,2));
+  };
+
+  useEffect(() => {
+    try {
+      editor.getSession().on("change", handleEditorChange);
+      return () => {
+        editor.getSession().off("change", handleEditorChange);
+      };
+    } catch (error) {
+      console.error("Error making request to handleEditorChange:", error);
+    }
+  }, []);
 
   return (
     <>
@@ -261,7 +281,7 @@ const CodeEditor = () => {
               <option value="javascript">JavaScript</option>
             </select>
           </div>
-          <Mic />
+          <Mic codeInput={codeInput} onResponse={handleMicResponse} />
         </div>
 
         <div ref={editorRef} style={{ height: "400px", width: "100%" }} />
