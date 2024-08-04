@@ -1,76 +1,41 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import { saveAs } from "file-saver";
+import React, { useState, useRef } from "react";
 import { Button } from "antd";
 
 const Mic = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [audioChunks, setAudioChunks] = useState([]);
+  const [audioURL, setAudioURL] = useState("");
   const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   const [isTracking, setIsTracking] = useState(false);
 
-  useEffect(() => {
-    if (isRecording) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          const recorder = new MediaRecorder(stream);
-          mediaRecorderRef.current = recorder;
-
-          recorder.ondataavailable = (event) => {
-            setAudioChunks((prev) => [...prev, event.data]);
-          };
-
-          recorder.onstop = () => {
-            const blob = new Blob(audioChunks, { type: "audio/wav" });
-            saveAudioLocally(blob);
-            saveAudioToServer(blob);
-            setAudioChunks([]);
-          };
-
-          recorder.start();
-        })
-        .catch((error) => console.error("Error accessing microphone:", error));
-    } else if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-    }
-  }, [isRecording]);
-
-  const startRecording = () => {
-    setIsRecording(true);
-  };
-
   const handleToggleTracking = () => {
     setIsTracking(!isTracking);
+    // Add any additional logic needed to start or stop tracking
   };
 
-  const stopRecording = () => {
-    setIsRecording(false);
-  };
-
-  const saveAudioToServer = async (blob) => {
-    const formData = new FormData();
-    formData.append("audio", blob, "recording.wav");
-
+  const startRecording = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
         }
-      );
-
-      if (response.status !== 200) {
-        throw new Error("Failed to upload audio");
-      }
-
-      console.log("Audio uploaded successfully");
+      };
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioURL(audioUrl);
+        saveAudioLocally(audioBlob);
+        audioChunksRef.current = [];
+      };
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
     } catch (error) {
-      console.error("Error uploading audio:", error);
+      console.error("Error accessing microphone:", error);
     }
   };
 
@@ -78,8 +43,26 @@ const Mic = () => {
     saveAs(blob, "recording.wav");
   };
 
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   return (
-    <div>
+    <div className="m-4">
+      <Button
+        style={{ marginRight: "10px" }}
+        disabled={isTracking}
+        onClick={isRecording ? stopRecording : startRecording}
+      >
+        {isRecording ? "Stop Recording" : "Start Recording"}
+      </Button>
+      {audioURL && (
+        <audio src={audioURL} controls style={{ display: "none" }} />
+      )}
+
       <Button
         className={`text-white px-4 py-2 rounded-lg ml-auto mr-6 bg-orange-600 hover:bg-green-700${
           isTracking
@@ -90,22 +73,6 @@ const Mic = () => {
       >
         {isTracking ? "Stop Tracking" : "Start Tracking"}
       </Button>
-      <Button
-        onClick={startRecording}
-        disabled={isTracking}
-        className="text-white px-4 py-2 rounded-lg ml-auto mr-6 bg-green-600 hover:bg-green-700"
-      >
-        {isRecording ? "RECORDING" : "MIC OFF"}
-      </Button>
-      <Button
-        onClick={stopRecording}
-        disabled={isTracking}
-        name="stop"
-        className="text-white px-4 py-2 rounded-lg ml-auto mr-6 bg-red-600 hover:bg-red-700"
-      >
-        Stop
-      </Button>
-      <audio id="audio" controls style={{ display: "none" }}></audio>
     </div>
   );
 };
