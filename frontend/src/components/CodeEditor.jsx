@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import MicToggle from "../components/MicToggle";
+import Mic from "./Mic";
 
 const CodeEditor = () => {
   const editorRef = useRef(null);
@@ -125,7 +125,7 @@ const CodeEditor = () => {
               <option value="javascript">JavaScript</option>
             </select>
           </div>
-          <MicToggle />
+          <Mic />
         </div>
 
         <div ref={editorRef} style={{ height: "400px", width: "100%" }} />

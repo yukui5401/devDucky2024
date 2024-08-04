@@ -1,89 +1,97 @@
-const [isRecording, setIsRecording] = useState(false);
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { saveAs } from "file-saver";
 
-    useEffect(() => {
-        const btnStart = document.querySelector('button[name="record"]');
-        const btnStop = document.querySelector('button[name="stop"]');
-        const audio = document.querySelector('#audio');
+const Mic = () => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isMicOn, setIsMicOn] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioChunks, setAudioChunks] = useState([]);
 
-        if (!btnStart || !btnStop || !audio) {
-            console.error('One or more of btnStart, btnStop, audio are not found in DOM');
-            return;
+  useEffect(() => {
+    if (isRecording) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          const recorder = new MediaRecorder(stream);
+          setMediaRecorder(recorder);
+
+          recorder.ondataavailable = (event) => {
+            setAudioChunks((prev) => [...prev, event.data]);
+          };
+
+          recorder.start();
+        })
+        .catch((error) => console.error("Error accessing microphone:", error));
+    } else if (mediaRecorder) {
+      mediaRecorder.stop();
+    }
+  }, [isRecording]);
+
+  const startRecording = () => {
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+  };
+
+  const saveAudioToServer = async (blob) => {
+    const formData = new FormData();
+    formData.append("audio", blob, "recording.wav");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
+      );
 
-        const handleStartClick = async () => {
-            try {
-                let stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                let mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.start();
-                setIsRecording(true);
+      if (response.status !== 200) {
+        throw new Error("Failed to upload audio");
+      }
 
-                let chunks = [];
-                mediaRecorder.ondataavailable = (e) => {
-                    chunks.push(e.data);
-                };
+      console.log("Audio uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading audio:", error);
+    }
+  };
 
-                mediaRecorder.onerror = (e) => {
-                    alert(e.error);
-                };
+  const saveAudioLocally = (blob) => {
+    saveAs(blob, "tmp/recording.wav");
+  };
 
-                mediaRecorder.onstop = async () => {
-                    setIsRecording(false);
-                    let blob = new Blob(chunks, { 'type': 'audio/mpeg; codecs=mp3' });
-                    // options:
-                    // audio/ogg; codecs=opus
-                    // audio/mpeg; codecs=mp3
-                    // audio/wav; codecs=pcm
+  useEffect(() => {
+    if (!isRecording && audioChunks.length > 0) {
+      const blob = new Blob(audioChunks, { type: "audio/wav" });
+      saveAudioLocally(blob);
+      saveAudioToServer(blob);
+      setAudioChunks([]);
+    }
+  }, [isRecording]);
 
-                    // Call uploadAudio to send the recorded audio to the backend
-                    await uploadAudio(blob);
+  return (
+    <div>
+      <button
+        onClick={startRecording}
+        className="text-white px-4 py-2 rounded-lg ml-auto mr-6 bg-green-600 hover:bg-green-700"
+      >
+        {isRecording ? "RECORDING" : "MIC OFF"}
+      </button>
+      <button
+        onClick={stopRecording}
+        name="stop"
+        className="text-white px-4 py-2 rounded-lg ml-auto mr-6 bg-red-600 hover:bg-red-700"
+      >
+        Stop
+      </button>
+      <audio id="audio" controls style={{ display: "none" }}></audio>
+    </div>
+  );
+};
 
-                    // Set the src attribute of the audio element for local playback
-                    let url = URL.createObjectURL(blob);
-                    audio.src = url;
-                };
-
-                btnStop.addEventListener('click', () => {
-                    mediaRecorder.stop();
-                });
-            } catch (err) {
-                console.error('Error accessing media devices.', err);
-            }
-        };
-
-        const uploadAudio = async (audioBlob) => {
-            try {
-                const formData = new FormData();
-                formData.append('audio', audioBlob);
-
-                const response = await fetch('/record', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    const responseData = await response.json();
-                    setData(responseData);
-                    console.log('Audio uploaded successfully');
-                } else {
-                    console.error('Failed to upload audio');
-                }
-            } catch (error) {
-                console.error('Error uploading audio:', error);
-            }
-        };
-
-        btnStart.addEventListener('click', handleStartClick);
-
-        // Cleanup event listeners on component unmount
-        return () => {
-            btnStart.removeEventListener('click', handleStartClick);
-        };
-    }, []);
-
-    return (
-        <div>
-            <button onClick={handleStartClick}>
-                Start
-            </button>
-        </div>
-    )
+export default Mic;
