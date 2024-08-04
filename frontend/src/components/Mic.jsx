@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { saveAs } from "file-saver";
 
 const Mic = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [isMicOn, setIsMicOn] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioChunks, setAudioChunks] = useState([]);
+  const mediaRecorderRef = useRef(null);
 
   useEffect(() => {
     if (isRecording) {
@@ -14,17 +13,24 @@ const Mic = () => {
         .getUserMedia({ audio: true })
         .then((stream) => {
           const recorder = new MediaRecorder(stream);
-          setMediaRecorder(recorder);
+          mediaRecorderRef.current = recorder;
 
           recorder.ondataavailable = (event) => {
             setAudioChunks((prev) => [...prev, event.data]);
           };
 
+          recorder.onstop = () => {
+            const blob = new Blob(audioChunks, { type: "audio/wav" });
+            saveAudioLocally(blob);
+            saveAudioToServer(blob);
+            setAudioChunks([]);
+          };
+
           recorder.start();
         })
         .catch((error) => console.error("Error accessing microphone:", error));
-    } else if (mediaRecorder) {
-      mediaRecorder.stop();
+    } else if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
     }
   }, [isRecording]);
 
@@ -62,17 +68,8 @@ const Mic = () => {
   };
 
   const saveAudioLocally = (blob) => {
-    saveAs(blob, "tmp/recording.wav");
+    saveAs(blob, "recording.wav");
   };
-
-  useEffect(() => {
-    if (!isRecording && audioChunks.length > 0) {
-      const blob = new Blob(audioChunks, { type: "audio/wav" });
-      saveAudioLocally(blob);
-      saveAudioToServer(blob);
-      setAudioChunks([]);
-    }
-  }, [isRecording]);
 
   return (
     <div>
