@@ -18,7 +18,7 @@ An integrated IDE that does more than hold your code.
 ### Installing our model
 1. Download our trained gguf (https://huggingface.co/sjsaug17/ht6_phi3mini.1efinetune/blob/main/unsloth.Q4_K_M.gguf)
 2. Name it 'model.gguf' and place it in the root project directory
-3. Run 'ollama create test1' (in the root directory)
+3. Run 'ollama create duckyModel' (in the root directory)
 4. Done!
 
 ### Installing node modules

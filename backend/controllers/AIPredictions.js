@@ -39,8 +39,8 @@ const GetCodeInputSuggestion = async (req, res, next) => {
     // get code response (in JSON) from model
     "http://localhost:5001/generate-suggestions",
     {
-      query: "how are you doing",
-      transcribed: "good, how are you",
+      query: "if (file) { return 'not found' } else { return 'not found' }",
+      transcribed: "What is wrong with my code!",
     }
   );
   let formattedAnswer = answer.data;
