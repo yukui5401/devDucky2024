@@ -1,12 +1,12 @@
 import React, { useState, useRef } from "react";
 import { Button } from "antd";
+import { saveAs } from "file-saver";
 
 const Mic = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState("");
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
   const [isTracking, setIsTracking] = useState(false);
 
   const handleToggleTracking = () => {
@@ -38,9 +38,9 @@ const Mic = () => {
       console.error("Error accessing microphone:", error);
     }
   };
-
-  const saveAudioLocally = (blob) => {
-    saveAs(blob, "recording.wav");
+  const saveAudioLocally = (audioBlob) => {
+    const fileName = `recording_${new Date().toISOString()}.wav`;
+    saveAs(audioBlob, fileName);
   };
 
   const stopRecording = () => {
@@ -51,18 +51,7 @@ const Mic = () => {
   };
 
   return (
-    <div className="m-4">
-      <Button
-        style={{ marginRight: "10px" }}
-        disabled={isTracking}
-        onClick={isRecording ? stopRecording : startRecording}
-      >
-        {isRecording ? "Stop Recording" : "Start Recording"}
-      </Button>
-      {audioURL && (
-        <audio src={audioURL} controls style={{ display: "none" }} />
-      )}
-
+    <div>
       <Button
         className={`text-white px-4 py-2 rounded-lg ml-auto mr-6 bg-orange-600 hover:bg-green-700${
           isTracking
@@ -73,6 +62,12 @@ const Mic = () => {
       >
         {isTracking ? "Stop Tracking" : "Start Tracking"}
       </Button>
+      <Button onClick={isRecording ? stopRecording : startRecording}>
+        {isRecording ? "Stop Recording" : "Start Recording"}
+      </Button>
+      {audioURL && (
+        <audio src={audioURL} controls style={{ display: "none" }} />
+      )}
     </div>
   );
 };
