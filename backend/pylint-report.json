@@ -1,67 +1,42 @@
-[
-    {
-        "type": "convention",
-        "module": "tempPyCode",
-        "obj": "",
-        "line": 1,
-        "column": 0,
-        "endLine": null,
-        "endColumn": null,
-        "path": "tempPyCode.txt",
-        "symbol": "missing-final-newline",
-        "message": "Final newline missing",
-        "message-id": "C0304"
+{
+    "summary": {
+        "total_files": 10,
+        "total_errors": 25,
+        "total_warnings": 15
     },
-    {
-        "type": "convention",
-        "module": "tempPyCode",
-        "obj": "",
-        "line": 1,
-        "column": 0,
-        "endLine": null,
-        "endColumn": null,
-        "path": "tempPyCode.txt",
-        "symbol": "missing-module-docstring",
-        "message": "Missing module docstring",
-        "message-id": "C0114"
-    },
-    {
-        "type": "convention",
-        "module": "tempPyCode",
-        "obj": "",
-        "line": 1,
-        "column": 0,
-        "endLine": null,
-        "endColumn": null,
-        "path": "tempPyCode.txt",
-        "symbol": "invalid-name",
-        "message": "Module name \"tempPyCode\" doesn't conform to snake_case naming style",
-        "message-id": "C0103"
-    },
-    {
-        "type": "warning",
-        "module": "tempPyCode",
-        "obj": "",
-        "line": 1,
-        "column": 0,
-        "endLine": 1,
-        "endColumn": 18,
-        "path": "tempPyCode.txt",
-        "symbol": "pointless-statement",
-        "message": "Statement seems to have no effect",
-        "message-id": "W0104"
-    },
-    {
-        "type": "error",
-        "module": "tempPyCode",
-        "obj": "",
-        "line": 1,
-        "column": 0,
-        "endLine": 1,
-        "endColumn": 18,
-        "path": "tempPyCode.txt",
-        "symbol": "undefined-variable",
-        "message": "Undefined variable 'aisdnfiasdnfsadinf'",
-        "message-id": "E0602"
-    }
-]
+    "files": [
+        {
+            "file_path": "/path/to/file1.py",
+            "errors": [
+                {
+                    "line": 10,
+                    "column": 5,
+                    "message": "Undefined variable 'x'"
+                },
+                {
+                    "line": 15,
+                    "column": 10,
+                    "message": "Unused import 'os'"
+                }
+            ],
+            "warnings": [
+                {
+                    "line": 20,
+                    "column": 3,
+                    "message": "Line too long"
+                }
+            ]
+        },
+        {
+            "file_path": "/path/to/file2.py",
+            "errors": [
+                {
+                    "line": 5,
+                    "column": 2,
+                    "message": "Invalid syntax"
+                }
+            ],
+            "warnings": []
+        }
+    ]
+}

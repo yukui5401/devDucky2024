@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "ace-builds": "^1.35.4",
+    "antd": "^5.20.0",
     "axios": "^1.7.3",
     "clsx": "^2.1.1",
     "file-saver": "^2.0.5",

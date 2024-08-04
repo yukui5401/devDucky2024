@@ -1,11 +1,59 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { createElement, useEffect, useRef, useState } from "react";
 import Mic from "./Mic";
+import { CaretRightOutlined } from "@ant-design/icons";
+import { Collapse, message, theme } from "antd";
+import { Button } from "antd";
+import axios from "axios";
 
 const CodeEditor = () => {
   const editorRef = useRef(null);
   const [editor, setEditor] = useState(null);
   const [language, setLanguage] = useState("javascript");
   const [output, setOutput] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [_loading, setLoading] = useState(false);
+
+  const [line = 0, setLine] = useState(0);
+  const [messages = [], setMessages] = useState([]);
+  const [errorCount = 0, setErrorCount] = useState(0);
+  const [fixableErrorCount = 0, setFixableErrorCount] = useState(0);
+  const [warnings, setWarnings] = useState(0);
+
+  const [duckyTopic, setDuckyTopic] = useState("");
+  const [duckyAdvices, setDuckyAdvices] = useState("");
+  const [duckyAdvicesConfidence, setDuckyAdvicesConfidence] = useState("");
+  const [duckyCode, setDuckyCode] = useState("");
+
+  const getItems = (panelStyle) => [
+    {
+      key: "1",
+      label: "Errors/Warnings",
+      children: (
+        <p>
+          Errors: {errorCount} <br />
+          Fixable Errors: {fixableErrorCount} <br />
+          Warnings: {warnings} <br />
+          Line: {line} <br />
+          messages: {messages}
+        </p>
+      ),
+      style: { panelStyle },
+    },
+    {
+      key: "2",
+      label: "Ducky Advices",
+      children: (
+        <p>
+          Ducky says: <br />
+          Topic: {duckyTopic} <br />
+          Advices: {duckyAdvices} <br />
+          Confidence: {duckyAdvicesConfidence} <br />
+          Code: {duckyCode}
+        </p>
+      ),
+      style: { panelStyle },
+    },
+  ];
 
   useEffect(() => {
     // Load Ace Editor from CDN
@@ -44,12 +92,76 @@ const CodeEditor = () => {
         case "javascript":
           editor.session.setMode("ace/mode/javascript");
           break;
+        case "typescript":
+          editor.session.setMode("ace/mode/javascript");
+          break;
         default:
           editor.session.setMode("ace/mode/javascript");
           break;
       }
     }
   }, [language, editor]);
+
+  const getEditorText = () => {
+    if (editor) {
+      setCodeInput(editor.getSession().getValue());
+    }
+
+    getLintingErrors();
+  };
+
+  const getLintingErrors = async () => {
+    setLoading(true);
+    let lintingErrors;
+    switch (language) {
+      case "cpp":
+        setCodeInput("C++ Linting Errors");
+        break;
+      case "php":
+        setCodeInput("PHP Linting Errors");
+        break;
+      case "python":
+        lintingErrors = await axios
+          .post("http://localhost:4000/linting/pylint", { code: codeInput })
+          .then(async (response) => {
+            const jsonResponse = response.data;
+            await setLine(codeInput);
+            await setMessages([]);
+            await setErrorCount(jsonResponse.summary.total_errors);
+            await setFixableErrorCount(0);
+            await setWarnings(jsonResponse.summary.total_warnings);
+          });
+        break;
+      case "javascript":
+        lintingErrors = await axios
+          .post("http://localhost:4000/linting/jslint", { code: codeInput })
+          .then(async (response) => {
+            const jsonResponse = response.data;
+            await setLine(codeInput);
+            await setMessages(jsonResponse[0].messages);
+            await setErrorCount(jsonResponse[0].errorCount);
+            await setFixableErrorCount(jsonResponse[0].fixableErrorCount);
+            await setWarnings(jsonResponse[0].warningCount);
+          });
+        break;
+      case "typescript":
+        lintingErrors = await axios
+          .post("http://localhost:4000/linting/tslint", { code: codeInput })
+          .then(async (response) => {
+            const jsonResponse = response.data;
+            await setLine(codeInput);
+            await setMessages(jsonResponse[0].messages);
+            await setErrorCount(jsonResponse[0].errorCount);
+            await setFixableErrorCount(jsonResponse[0].fixableErrorCount);
+            await setWarnings(jsonResponse[0].warningCount);
+          });
+        break;
+      default:
+        editor.session.setMode("ace/mode/javascript");
+    }
+
+    setLoading(false);
+  };
 
   const handleLanguageChange = (e) => {
     setLanguage(e.target.value);
@@ -102,6 +214,15 @@ const CodeEditor = () => {
     }
   };
 
+  useEffect(() => {}, []);
+  const { token } = theme.useToken();
+  const panelStyle = {
+    marginBottom: 24,
+    background: token.colorFillAlter,
+    borderRadius: token.borderRadiusLG,
+    border: "none",
+  };
+
   return (
     <>
       <div>
@@ -122,6 +243,7 @@ const CodeEditor = () => {
               <option value="ruby">Ruby</option>
               <option value="php">PHP</option>
               <option value="python">Python</option>
+              <option value="typescript">TypeScript</option>
               <option value="javascript">JavaScript</option>
             </select>
           </div>
@@ -135,9 +257,28 @@ const CodeEditor = () => {
         >
           Run
         </button>
+        <Button
+          loading={_loading}
+          className="btn bg-green-500 text-white px-8 py-2 rounded mt-4 ml-4"
+          onClick={getEditorText}
+        >
+          Compile
+        </Button>
         <div className="output p-4 border-2 border-gray-800 mt-4">
           <pre>{output}</pre>
         </div>
+
+        <Collapse
+          bordered={false}
+          defaultActiveKey={["1"]}
+          expandIcon={({ isActive }) => (
+            <CaretRightOutlined rotate={isActive ? 90 : 0} />
+          )}
+          style={{
+            background: token.colorBgContainer,
+          }}
+          items={getItems(panelStyle)}
+        />
       </div>
     </>
   );
