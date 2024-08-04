@@ -9,7 +9,7 @@ const Homepage = () => {
       <Hero />
       <CenteredParagraph>
         Have you ever needed a rubber ducky timeout? Spent hours trying to work
-        out a single bug? Well, DevDucky might be for you! Our state of the art
+        out a single bug? Well, devDucky might be for you! Our state of the art
         IDE is connected to a rubber ducky that can talk you through your
         problems.
       </CenteredParagraph>

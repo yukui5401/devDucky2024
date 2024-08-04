@@ -59,19 +59,47 @@ const CodeEditor = () => {
     if (!editor) return;
 
     const code = editor.getSession().getValue();
-    fetch("/ide/app/compiler.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        language,
-        code,
-      }),
-    })
-      .then((response) => response.text())
-      .then((result) => setOutput(result))
-      .catch((error) => setOutput(`Error: ${error}`));
+
+    if (language === "javascript") {
+      try {
+        // Create a new function to capture output
+        const oldLog = console.log;
+        let log = "";
+        console.log = (...args) => {
+          log +=
+            args
+              .map((arg) =>
+                typeof arg === "object" ? JSON.stringify(arg) : arg
+              )
+              .join(" ") + "\n";
+        };
+
+        // Execute the code
+        new Function(code)();
+
+        // Restore the original console.log
+        console.log = oldLog;
+
+        setOutput(log || "No output");
+      } catch (error) {
+        setOutput(`Error: ${error.message}`);
+      }
+    } else {
+      // For other languages, make the server request
+      fetch("/ide/app/compiler.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language,
+          code,
+        }),
+      })
+        .then((response) => response.text())
+        .then((result) => setOutput(result))
+        .catch((error) => setOutput(`Error: ${error.message}`));
+    }
   };
 
   return (

@@ -4,7 +4,7 @@ import React from "react";
 // title and subtitle are a work in progress
 const Hero = ({
   title = "Say goodbye to hours of headbanging.",
-  subtitle = "Introducing... devDucky! An integrated IDE that does more than code",
+  subtitle = "Introducing... devDucky! An integrated IDE that does more than hold your code",
 }) => {
   return (
     <section className="bg-custom-green py-20 mb-4">
