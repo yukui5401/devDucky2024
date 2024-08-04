@@ -34,7 +34,7 @@ const CodeEditor = () => {
           Fixable Errors: {fixableErrorCount} <br />
           Warnings: {warnings} <br />
           Line: {line} <br />
-          messages: {messages}
+          messages: {messages.map((message) => message.message)} <br />
         </p>
       ),
       style: { panelStyle },
@@ -223,6 +223,20 @@ const CodeEditor = () => {
     border: "none",
   };
 
+  const getDucky = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post("http://localhost:5005/code-input", {
+        query: editor.getSession().getValue(),
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error making request:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div>
@@ -251,18 +265,25 @@ const CodeEditor = () => {
         </div>
 
         <div ref={editorRef} style={{ height: "400px", width: "100%" }} />
-        <button
-          className="btn bg-blue-500 text-white px-4 py-2 rounded mt-4"
+        <Button
+          className="btn bg-blue-500 text-white px-4 py-2 rounded mt-4 ml-4"
           onClick={runCode}
         >
           Run
-        </button>
+        </Button>
         <Button
           loading={_loading}
           className="btn bg-green-500 text-white px-8 py-2 rounded mt-4 ml-4"
           onClick={getEditorText}
         >
           Compile
+        </Button>
+        <Button
+          loading={_loading}
+          className="btn bg-yellow-500 text-white px-8 py-2 rounded mt-4 ml-4"
+          onClick={getDucky}
+        >
+          Ducky
         </Button>
         <div className="output p-4 border-2 border-gray-800 mt-4">
           <pre>{output}</pre>

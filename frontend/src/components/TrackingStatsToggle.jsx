@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import CardGrid from "./CardGrid";
+import DashboardStatsMonitoring from "./DashboardStatsMonitoring";
+import DataTable from "./DataTable";
 
 const TrackingStatsToggle = () => {
-  const [activeTab, setActiveTab] = useState("daily");
+  const [activeTab, setActiveTab] = useState("codep");
   const [isTracking, setIsTracking] = useState(true);
 
   const handleToggleTracking = () => {
@@ -16,13 +18,13 @@ const TrackingStatsToggle = () => {
         <div className="inline-flex border-b border-gray-300">
           <button
             className={`py-2 px-4 text-lg font-medium ${
-              activeTab === "daily"
+              activeTab === "codep"
                 ? "text-indigo-600 border-b-2 border-indigo-600"
                 : "text-gray-600"
             }`}
-            onClick={() => setActiveTab("daily")}
+            onClick={() => setActiveTab("codep")}
           >
-            Daily
+            Code Performance Monitor
           </button>
           <button
             className={`py-2 px-4 text-lg font-medium ${
@@ -32,51 +34,22 @@ const TrackingStatsToggle = () => {
             }`}
             onClick={() => setActiveTab("weekly")}
           >
-            Weekly
-          </button>
-          <button
-            className={`py-2 px-4 text-lg font-medium ${
-              activeTab === "monthly"
-                ? "text-indigo-600 border-b-2 border-indigo-600"
-                : "text-gray-600"
-            }`}
-            onClick={() => setActiveTab("monthly")}
-          >
-            Monthly
+            Observability Monitor (Prototype)
           </button>
         </div>
-        <button
-          className={`text-white px-4 py-2 rounded-lg ${
-            isTracking
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
-          onClick={handleToggleTracking}
-        >
-          {isTracking ? "Stop Tracking" : "Start Tracking"}
-        </button>
       </div>
 
       <div className="p-6 bg-white shadow-xl rounded-lg">
-        {activeTab === "daily" && (
+        {activeTab === "codep" && (
           <div>
-            <h3 className="text-xl font-bold mb-4">Daily Stats</h3>
-            <p className="text-gray-600">Here are the daily stats...</p>
-            <CardGrid />
+            <h3 className="text-xl font-bold mb-4">Code Monitor</h3>
+            <DashboardStatsMonitoring />
           </div>
         )}
         {activeTab === "weekly" && (
           <div>
-            <h3 className="text-xl font-bold mb-4">Weekly Stats</h3>
-            <p className="text-gray-600">Here are the weekly stats...</p>
-            <CardGrid />
-          </div>
-        )}
-        {activeTab === "monthly" && (
-          <div>
-            <h3 className="text-xl font-bold mb-4">Monthly Stats</h3>
-            <p className="text-gray-600">Here are the monthly stats...</p>
-            <CardGrid />
+            <h3 className="text-xl font-bold mb-4">Code Graph</h3>
+            <DataTable />
           </div>
         )}
       </div>

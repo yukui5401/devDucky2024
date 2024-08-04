@@ -78,6 +78,19 @@ const PostTsLint = async (req, res, next) => {
     }
 }
 
+const GetJsLint = async (req, res, next) => {
+    try {
+        const fileContents = await fs.readFile('eslint-report.json', 'utf8');
+
+        const jsonResponse = await JSON.parse(fileContents);
+
+        res.status(200).json(jsonResponse);
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     PostJsLint,
     PostPyLint,
