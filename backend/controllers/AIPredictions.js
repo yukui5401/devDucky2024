@@ -37,7 +37,7 @@ const GetCodeInputSuggestion = async (req, res, next) => {
 
   const answer = await axios.post(
     // get code response (in JSON) from model
-    "http://localhost:5001/generate-suggestions",
+    "http://localhost:5005/generate-suggestions",
     {
       query: "if (file) { return 'not found' } else { return 'not found' }",
       transcribed: "What is wrong with my code!",
