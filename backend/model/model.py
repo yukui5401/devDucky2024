@@ -10,7 +10,7 @@ model = 'duckyModel'
 PROMPT_TEMPLATE = """
 Transcript: {transcript}
 Context: {context}
-Fix the code above for syntax and logical errors. Return your response with 2 keys: advice and improved_code.
+Fix the code above for syntax and logical errors. Return your response with 2 keys: topic (choose from syntax/logic error or optimization), advice, advice_confidence (from 0 to 1) and improved_code.
 """
 
 @app.route('/code-input', methods=['POST'])
