@@ -1,11 +1,12 @@
 # devDucky @ HT6 2024
+[Link to Devpost](https://devpost.com/software/devducky)
 
 ## About
 An integrated IDE that does more than hold your code.
 
 ### Stack
 - Unsloth: We used Unsloth to fine-tune and quantize our model. We fine-tuned three different models (llama3.1 @ 375 steps, tinyllama @ 1 epoch, phi3 @ 375 steps) before settling on phi3 due to hardware constraints. We quantized all of our models to Q4_K_M.
-- Ollama: We used the Ollama python library along with the Ollama cli and desktop instance to run inference on our model.
+- Ollama: We used the Ollama Python library along with the Ollama cli and desktop instance to run inferences on our model.
 - Express: This forms the backbone of our API architecture, handling backend logic for audio recording, data analysis, and cleaning processes.
 - Node: This powers our server-side operations, providing a fast and scalable foundation for our backend infrastructure.
 - Vite: This drives our frontend development, enabling rapid UI implementation and efficient routing across our responsive, modern interface.
